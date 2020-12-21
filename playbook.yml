@@ -1,0 +1,29 @@
+- name: Install zabbix-agent2
+  hosts: localhost
+  become: true
+  gather_facts: True
+  vars_files:
+    - vars.yml
+  tasks: 
+    - name: Remove zabix-agent
+      apt:
+        name: zabix-agent
+        state: absent
+    - name: Install zabbix-agent2
+      apt:
+        name: zabbix-agent2
+        state: present
+    - name: Remove default config
+      file: 
+        path: /etc/zabbix/zabbix_agentd.conf
+        state: absent
+    - name: Update config file name
+      command: mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd2.conf 
+    - name: Add user to docker group
+      user:
+        name: zabbix
+        group: docker
+    - name: Restart zabbix-agent2
+      service: 
+        name: zabbix-agent2
+        state: restarted
